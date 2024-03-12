@@ -40,6 +40,7 @@ product.get("/", async (req, res) => {
 
 product.get("/categories", async (req, res) => {
   const allCategories = await getAllCategories();
+  console.log('allCategories', allCategories)
   if (allCategories[0]) {
     res.status(200).json(allCategories);
   } else {

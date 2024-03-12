@@ -67,7 +67,10 @@ Getting started with the $mrtCART backend is a breeze:
 3. Create a `.env` file in the root directory and add the following environment variables:
 
    ```
-   PORT=<4444>
+   PORT=4444
+   PG_DATABASE=cart_dev
+   PG_HOST=localhost
+   PG_USER=postgres
    ```
 
 4. Start the server using the following command

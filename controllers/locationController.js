@@ -1,5 +1,6 @@
 const express = require("express");
 const location = express.Router();
+const asyncWrapper = require('../utilities/middleware/asyncWrapper')
 
 const {
   getAllLocations,
@@ -9,46 +10,54 @@ const {
   getStoresWithinDistanceByCoordinates,
 } = require("../queries/locationQuery.js");
 
-// INDEX - show all locations
 
-location.get("/", async (request, response) => {
+// Local error handler for the location controller. Since we used this in both the product controller and this controller, we can extract this out
+// to a utilities/middleware directory in a errorhandler.js file.
+const locationErrorHandler = (err, req, res, next) => {
+  console.error(err.stack);
+  const statusCode = err.statusCode || 500;
+  const errorMessage = err.message || "Internal Server Error";
+  res.status(statusCode).json({ error: errorMessage });
+};
+
+// INDEX - show all locations
+location.get("/", asyncWrapper(async (req, res) => {
   const allLocations = await getAllLocations();
   if (allLocations[0]) {
-    response.status(200).json(allLocations);
+    res.status(200).json(allLocations);
   } else {
-    response.status(500).json({ error: "Server Error" });
+    throw new Error("Server Error");
   }
-});
+}));
 
 // Show one location by id
 
-location.get("/:zipCode", async (request, response) => {
-  const { zipCode } = request.params;
+location.get("/:zipCode", asyncWrapper(async (req, res) => {
+  const { zipCode } = req.params;
   const { error, result } = await getLocationByZipCode(zipCode);
-
   if (error?.code === 0) {
-    response.status(404).json({ error: "Location Not Found" });
+    throw new Error("Location Not Found");
   } else if (error) {
-    response.status(500).json({ error: "Server Error" });
+    throw new Error("Server Error");
   } else {
-    response.status(200).json(result);
+    res.status(200).json(result);
   }
-});
+}));
 
 // show name, zipcode by latitude and longitude
 
-location.get("/:latitude/:longitude", async (request, response) => {
-  const { latitude, longitude } = request.params;
+location.get("/:latitude/:longitude", asyncWrapper(async (req, res) => {
+  const { latitude, longitude } = req.params;
   const { error, result } = await getLocationByCoordinates(latitude, longitude);
 
   if (error?.code === 0) {
-    response.status(404).json({ error: "Location Not Found" });
+    throw new Error("Location Not Found");
   } else if (error) {
-    response.status(500).json({ error: "Server Error" });
+    throw new Error("Server Error");
   } else {
-    response.status(200).json(result[0]);
+    res.status(200).json(result[0]);
   }
-});
+}));
 
 // get stores within user distance and zipcode
 
