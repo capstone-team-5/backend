@@ -89,4 +89,5 @@ location.get(
   }
 );
 
+location.use(locationErrorHandler);
 module.exports = location;
