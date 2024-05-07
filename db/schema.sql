@@ -51,6 +51,12 @@ CREATE TABLE product (
     product_is_gluten_free BOOLEAN DEFAULT false,
     product_is_international BOOLEAN DEFAULT false
 );
+-- An index is a data structure (usually a B-tree) that the database management system can use to find rows quickly.
+-- Without an index, the database system reads the entire table, row by row, to find the ones that satisfy the query conditions. This is called a full table scan and can be slow if the table is large.
+-- Indexes are particularly useful on columns that you frequently query or filter by, or columns used in join conditions between tables. However, indexes also come with trade-offs:
+-- They can significantly speed up data retrieval but can slow down data insertion and updates since the index needs to be updated as well.
+CREATE INDEX idx_product_name ON product(product_name);
+-- CREATE INDEX idx_product_name_category ON product(product_name, product_category);
 
 CREATE TABLE store_product (
     store_product_id SERIAL PRIMARY KEY,
